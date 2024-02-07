@@ -4,7 +4,12 @@
 class Round
 {
 public: 
-	void roundStart(Player& p1, Player& p2);
-	char nextPlayer;
+	Round();
+	void roundStart(Player *p1, Player *p2);
+	Player *nextPlayer;
 	char coinFlip();
+	//bool roundOver();
+
+private:
+
 };
