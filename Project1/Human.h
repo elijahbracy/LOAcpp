@@ -17,6 +17,10 @@ private:
 			//TODO: make piece move, update board
 			//board->MakeMove(move)
 		}
+		else
+		{
+			cout << "invalid" << endl;
+		}
 	};
 
 

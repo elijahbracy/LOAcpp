@@ -111,24 +111,37 @@ public:
 		// check until you get to 7
 		else
 		{
-			pair<int, int> smaller = SmallerPair(origin, destination);
-			int smallerCoordinate = min(smaller.first, smaller.second);
+			int rowStep = Slope(origin, destination).first;
+			int colStep = Slope(origin, destination).second;
 
-			int row = smaller.first - smallerCoordinate;
-			int col = smaller.second - smallerCoordinate;
+			// start at origin, follow slope to edge
+			int x = origin.first;
+			int y = origin.second;
 
-			
-
-			for (int bigger = max(row, col); bigger < 8; bigger++)
+			while (x >= 0 && x < 8 && y >= 0 && y < 8)
 			{
-				char curSpace = board[row][col];
-
+				char curSpace = board[x][y];
 				if (curSpace != '.')
 				{
 					numPieces++;
 				}
-				row++;
-				col++;
+				x += rowStep;
+				y += colStep;
+			}
+
+			// start at origin + 1 step in opposite direction, follow to edge going opposite direction
+			x = origin.first + colStep;
+			y = origin.second + rowStep;
+
+			while (x >= 0 && x < 8 && y >= 0 && y < 8)
+			{
+				char curSpace = board[x][y];
+				if (curSpace != '.')
+				{
+					numPieces++;
+				}
+				x += colStep;
+				y += rowStep;
 			}
 		}
 
@@ -141,6 +154,14 @@ public:
 		int colDiff = abs(origin.second - destination.second);
 
 		return max(rowDiff, colDiff);
+	}
+
+	pair<int, int> Slope(pair<int, int> origin, pair<int, int> destination)
+	{
+		int rowStep = (destination.first - origin.first) / SpacesToMove(origin, destination);
+		int colStep = (destination.second - origin.second) / SpacesToMove(origin, destination);
+
+		return make_pair(rowStep, colStep);
 	}
 
 	bool PiecesInWay(pair<int, int> origin, pair<int, int> destination, char curColor)
@@ -168,8 +189,8 @@ public:
 
 		//determine direction by taking (destination - origin) / steps
 		//will give 1, 0, or -1 for up, neutral or down
-		int rowStep = (destination.first - origin.first) / steps;
-		int colStep = (destination.second - origin.second) / steps;
+		int rowStep = Slope(origin, destination).first;
+		int colStep = Slope(origin, destination).second;
 
 	
 
@@ -178,7 +199,8 @@ public:
 		int col = origin.second + colStep;
 
 		//iterate from that space to destination checking for collision
-		for (int i = 0; i < steps; i++)
+		// stop 1 before destination
+		for (int i = 0; i < steps-1; i++)
 		{
 			char curSpace = board[row][col];
 			if (curSpace != '.' && curSpace != curColor)
@@ -217,10 +239,10 @@ private:
 		{'W', '.', '.', '.', '.', '.', '.', 'W'},
 		{'W', '.', '.', '.', '.', '.', '.', 'W'},
 		{'W', '.', '.', '.', '.', '.', '.', 'W'},
-		{'W', '.', '.', '.', '.', '.', '.', 'W'},
+		{'W', '.', '.', '.', 'B', '.', '.', 'W'},
 		{'W', '.', '.', '.', '.', '.', '.', 'W'},
 		{'W', 'B', '.', 'B', '.', '.', '.', 'W'},
-		{'.', 'B', 'B', 'B', 'B', 'B', 'B', '.'}
+		{'.', '.', 'B', 'B', 'B', 'B', 'B', '.'}
 	};
 
 
