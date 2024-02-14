@@ -1,18 +1,75 @@
 #include "Board.h"
 #include "Round.h"
 #include "Human.h"
+#include "Tournament.h"
 
 int main() {
 	Board *board = new Board;
 	Round round;
 	Human *p1 = new Human;
 	Human *p2 = new Human;
-	round.roundStart(p1, p2);
-	board->printBoard();
+	Tournament tournament;
+	
+	// added for further modularity of how many players in a game, just 2 will be used for now
+	vector<Player*> players = { p1, p2 };
+
 	//game loop
 	do {
-		round.nextPlayer->play(board);
+		//if first turn and not continuing game, initialize board and round
+		if (round.turnsPlayed == 0 && round.resumingGame == false)
+		{
+			//initialize round
+			round.roundStart(p1, p2);
 
+			// initialize board
+			board->setBoard(board->defaultBoard);
+		}
+		// print board
+		board->printBoard();
 
-	} while (1);
+		// have player make their turn
+		round.curPlayer->play(board);
+
+		// for each player, update pieces on board
+		for (int i = 0; i < players.size(); i++)
+		{
+			players[i]->UpdateNumPieces(board);
+		}
+
+		// check for win
+		if (board->CountGroups(round.curPlayer->color) == 1)
+		{
+			// score round
+			round.Score(round.curPlayer, round.nextPlayer->totalPieces);
+
+			// announce winner
+			round.announceRoundWin(round.curPlayer, round.nextPlayer);
+
+			// ask to play again
+			round.PlayAgain();
+
+			// set turns played to 0
+			round.turnsPlayed = 0;
+
+			// if play again, start gameloop over
+			if (round.playAgain)
+			{
+				continue;
+			}
+
+			// else, annouce tournament result
+			break;
+		}
+
+		// get next player
+		round.nextPlayer = round.GetNextPlayer(players, round.nextPlayer);
+
+		//increment turns played
+		round.turnsPlayed += 1;
+
+	} while (round.playAgain); //TODO: while()
+
+	// announce tournament ending stats
+	tournament.announceTournamentResult(round.curPlayer, round.nextPlayer);
+
 }

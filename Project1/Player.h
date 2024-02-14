@@ -6,6 +6,9 @@ class Player
 public:
 	char color;
 	int roundsWon = 0;
-	int score;
+	int score = 0;
 	virtual void play(Board* board) {};
+	int totalPieces = 12;
+
+	void UpdateNumPieces(Board* board);
 };

@@ -30,6 +30,7 @@
   <ItemGroup>
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Round.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

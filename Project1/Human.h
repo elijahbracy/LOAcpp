@@ -8,19 +8,23 @@ public:
 
 	Human() {};
 private:
-	void play(Board* board) override {
-		cout << "make a move (ex. b1->b3)" << endl;
+	void play(Board* board) override 
+	{
+		
 		string move;
-		cin >> move;
-
-		if (board->isValid(move, this->color)) {
-			//TODO: make piece move, update board
-			//board->MakeMove(move)
-		}
-		else
+		bool validMove;
+		do
 		{
+			cout << "make a move (ex. b1->b3)" << endl;
+			cin >> move;
+			validMove = board->isValid(move, this->color);
+			if (validMove)
+			{
+				board->MakeMove(move, this->color);
+				break;
+			}
 			cout << "invalid" << endl;
-		}
+		} while (!validMove);
 	};
 
 
