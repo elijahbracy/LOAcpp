@@ -22,6 +22,8 @@ public:
 	bool resumingGame = false;
 
 	void announceRoundWin(Player* curPlayer, Player* nextPlayer);
+	bool suspend = false;
+	void suspendGame(Board* board, Player* human, Player* comp);
 
 private:
 

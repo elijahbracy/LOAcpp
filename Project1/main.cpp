@@ -61,15 +61,18 @@ int main() {
 			break;
 		}
 
-		// get next player
-		round.nextPlayer = round.GetNextPlayer(players, round.nextPlayer);
-
 		//increment turns played
 		round.turnsPlayed += 1;
 
+		// ask if they would like to suspend game
+		round.suspendGame(board, p1, p2);
+
+		// get next player
+		round.nextPlayer = round.GetNextPlayer(players, round.nextPlayer);
+
 	} while (round.playAgain); //TODO: while()
 
-	// announce tournament ending stats
+	// announce tournament ending stats, skip if suspending game
 	tournament.announceTournamentResult(round.curPlayer, round.nextPlayer);
 
 }

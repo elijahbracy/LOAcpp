@@ -18,6 +18,12 @@ void Board::setBoard(const char (&newBoard)[8][8])
 		}
 	}
 };
+
+const char (*Board::getBoard())[8]
+{
+	return board;
+}
+
 void Board::printBoard()
 {
 	cout << " +-----------------+" << endl;

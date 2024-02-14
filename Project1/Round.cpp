@@ -2,6 +2,7 @@
 #include "iostream"
 #include <random>
 #include <algorithm>
+#include <fstream>
 using namespace std;
 
 Round::Round() {};
@@ -84,7 +85,7 @@ void Round::Score(Player* winner, int numOpponentPieces)
 
 void Round::PlayAgain()
 {
-	char response = 'Y';
+	char response;
 	do
 	{
 		cout << "Play again? (y/n): ";
@@ -123,4 +124,73 @@ char Round::coinFlip()
 	}
 
 
-}
+};
+
+void Round::suspendGame(Board* board, Player* human, Player* comp)
+{
+	char response;
+	do
+	{
+		cout << "Suspend game (data will be saved)?  (y/n): ";
+		cin >> response;
+		response = toupper(response);
+
+		if (response != 'Y' && response != 'N')
+		{
+			cout << "Invalid input. Enter 'y' to suspend game or 'n' to continue." << endl;
+		}
+
+	} while (response != 'Y' && response != 'N');
+
+	if (response == 'Y')
+	{
+		// create output file stream object
+		ofstream out;
+
+		// open file
+		out.open("gameState.txt");
+
+		// if unable to open display error message
+		if (!out.is_open())
+		{
+			cerr << "error opening file" << endl;
+		}
+
+		// get board
+		const char(*boardPtr)[8] = board->getBoard();
+
+		out << "Board:" << endl;
+		// save board state
+		for (int i = 0; i < 8; i++)
+		{
+			for (int j = 0; j < 8; j++)
+			{
+				// replace '.' with 'x'
+				if (boardPtr[i][j] == '.')
+				{
+					out << "x ";
+				}
+				else
+				{
+					out << boardPtr[i][j] << ' ';
+				}
+				
+			}
+			out << endl;
+		}
+
+		out << "Human:" << endl;
+		out << "Rounds won: " << human->roundsWon << endl;
+		out << "Score: " << human->score << endl;
+		out << endl;
+		out << "Computer: " << endl;
+		out << "Rounds won: " << comp->roundsWon << endl;
+		out << "Score: " << comp->score << endl;
+		out << endl;
+		out << "Next Player: " << this->nextPlayer->color << endl;
+		out << "Color: " << this->nextPlayer->color << endl;
+
+		out.close();
+
+	}
+};

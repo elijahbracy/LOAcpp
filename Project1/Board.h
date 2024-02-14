@@ -13,6 +13,8 @@ public:
 
 	void setBoard(const char(&newBoard)[8][8]);
 
+	const char(*getBoard())[8];
+
 	void MakeMove(string move, char curColor);
 
 	bool isValid(string move, char curColor);
