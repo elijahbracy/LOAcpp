@@ -16,5 +16,5 @@ Computer:
 Rounds won: 0
 Score: 0
 
-Next Player: Computer
+Next player: Computer
 Color: White

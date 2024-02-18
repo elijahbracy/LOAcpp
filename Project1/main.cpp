@@ -17,8 +17,8 @@ int main() {
 	if (round.resumeGame())
 	{
 		round.loadGameState(board, p1, p2);
-		board->printBoard();
 	}
+
 	//game loop
 	do {
 		//if first turn and not continuing game, initialize board and round
@@ -30,6 +30,7 @@ int main() {
 			// initialize board
 			board->setBoard(board->defaultBoard);
 		}
+
 		// print board
 		board->printBoard();
 

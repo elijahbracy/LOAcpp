@@ -192,11 +192,11 @@ void Round::suspendGame(Board* board, Player* human, Player* comp)
 		out << endl;
 		if (this->nextPlayer == human)
 		{
-			out << "Next Player: " << "Human" << endl;
+			out << "Next player: " << "Human" << endl;
 		}
 		else
 		{
-			out << "Next Player: " << "Computer" << endl;
+			out << "Next player: " << "Computer" << endl;
 		}
 		if (this->nextPlayer->color == 'B')
 		{
