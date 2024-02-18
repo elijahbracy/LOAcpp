@@ -55,27 +55,22 @@ void Round::announceRoundWin(Player* curPlayer, Player* nextPlayer)
 
 Player* Round::GetNextPlayer(vector<Player*>& playerList, Player* curPlayer)
 {
-	// get index of current player
-	auto it = find(playerList.begin(), playerList.end(), curPlayer);
+	Player* buff = this->curPlayer;
 
-	// it curPlayer found
-	if (it != playerList.end())
-	{
-		// get index of cuPlayer within vector
-		int index = distance(playerList.begin(), it);
+	this->curPlayer = this->nextPlayer;
 
-		// move to next player, wrapping around if at end
-		index = (index + 1) % playerList.size();
+	this->nextPlayer = buff;
 
-		// return pointer to next player
-		cout << "next player: " << playerList[index]->color << endl;
+	return buff;
+}
 
-		return playerList[index];
-	}
+void Round::SwitchPlayers()
+{
+	Player* buff = this->curPlayer;
 
-	// if current player not found, log and return nullptr
-	cout << "error: current player not found" << endl;
-	return nullptr;
+	this->curPlayer = this->nextPlayer;
+
+	this->nextPlayer = buff;
 }
 
 void Round::Score(Player* winner, int numOpponentPieces)

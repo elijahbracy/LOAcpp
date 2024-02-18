@@ -1,13 +1,14 @@
 #include "Board.h"
 #include "Round.h"
 #include "Human.h"
+#include "Computer.h"
 #include "Tournament.h"
 
 int main() {
 	Board *board = new Board;
 	Round round;
 	Human *p1 = new Human;
-	Human *p2 = new Human;
+	Player *p2 = new Computer;
 	Tournament tournament;
 	
 	// added for further modularity of how many players in a game, just 2 will be used for now
@@ -75,9 +76,9 @@ int main() {
 		round.suspendGame(board, p1, p2);
 
 		// get next player
-		round.nextPlayer = round.GetNextPlayer(players, round.nextPlayer);
+		round.SwitchPlayers();
 
-	} while (round.playAgain);
+	} while (!round.suspend);
 
 	// announce tournament ending stats, skip if suspending game
 	if (!round.suspend)

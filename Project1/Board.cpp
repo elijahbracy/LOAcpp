@@ -37,7 +37,7 @@ vector<string> Board::getPossibleMoves(char curColor)
 			}
 		}
 	}
-
+	return possibleMoves;
 };
 
 string Board::generateMoveString(int originRow, int originCol, int destinationRow, int destinationCol)
@@ -59,8 +59,6 @@ string Board::generateMoveString(int originRow, int originCol, int destinationRo
 	// add destination in same way as origin
 	move += static_cast<char>('A' + destinationCol);
 	move += to_string(destinationRow + 1);
-
-	cout << move;
 
 	return move;
 
@@ -121,35 +119,35 @@ bool Board::isValid(string move, char curColor)
 	pair<int, int> origin = parseOrigin(move);
 	pair<int, int> destination = parseDestination(move);
 
-	cout << board[origin.first][origin.second];
+	//cout << board[origin.first][origin.second];
 	char originSpace = board[origin.first][origin.second];
 	char destinationSpace = board[destination.first][destination.second];
 
 	// steps must equal number of pieces on that line
 	if (SpacesToMove(origin, destination) != PiecesOnLine(origin, destination))
 	{
-		cout << "steps must equal number of pieces on that line" << endl;
+		//cout << "steps must equal number of pieces on that line" << endl;
 		return false;
 	}
 
 	// origin coordinate has piece that belongs to player
 	if (originSpace != curColor)
 	{
-		cout << "origin coordinate must have piece that belongs to you" << endl;
+		//cout << "origin coordinate must have piece that belongs to you" << endl;
 		return false;
 	}
 
 	// desination is empty or has enemy piece
 	if (destinationSpace == curColor)
 	{
-		cout << "destination coordinate must be empty or have enemy piece" << endl;
+		//cout << "destination coordinate must be empty or have enemy piece" << endl;
 		return false;
 	}
 
 	// and path between has no enemy pieces
 	if (PiecesInWay(origin, destination, curColor))
 	{
-		cout << "path between origin and coordinate must have no enemy pieces" << endl;
+		//cout << "path between origin and coordinate must have no enemy pieces" << endl;
 		return false;
 	}
 
@@ -359,15 +357,15 @@ void Board::FloodFill(int row, int col, char color, vector<vector<bool>>& visite
 pair<int, int> Board::parseOrigin(string move) {
 	int row = move[1] - '0'; // get int from ascii number
 	row -= 1; // subtract 8 and flip sign to get proper row
-	int col = lettersToNumbers[move[0]]; //use map to get column number
-	cout << "coordinate of origin is: [" << row << "][" << col << ']' << endl;
+	int col = lettersToNumbers[tolower(move[0])]; //use map to get column number
+	//cout << "coordinate of origin is: [" << row << "][" << col << ']' << endl;
 	return make_pair(row, col);
 };
 
 pair<int, int> Board::parseDestination(string move) {
 	int row = move[5] - '0'; // get int from ascii number
 	row -= 1; // subtract 8 and flip sign to get proper row
-	int col = lettersToNumbers[move[4]]; //use map to get column number
-	cout << "coordinate of destination is: [" << row << "][" << col << ']' << endl;
+	int col = lettersToNumbers[tolower(move[4])]; //use map to get column number
+	//cout << "coordinate of destination is: [" << row << "][" << col << ']' << endl;
 	return make_pair(row, col);
 };

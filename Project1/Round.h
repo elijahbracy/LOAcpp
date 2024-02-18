@@ -21,6 +21,9 @@ public:
 	Player* GetNextPlayer(vector<Player*>& playerList, Player* curPlayer);
 
 	void Score(Player* winner, int numOpponentPieces);
+
+	void SwitchPlayers();
+
 	bool playAgain = false;
 
 	void PlayAgain();
