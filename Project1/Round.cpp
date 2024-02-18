@@ -23,7 +23,7 @@ void Round::roundStart(Player *player1, Player *player2) {
 
 		if (tolower(guess) == coinResult)
 		{
-			cout << "You won the coin toss. You will play first." << endl;
+			cout << "You won the coin toss. You will play first. Your color: Black" << endl;
 			curPlayer = player1;
 			nextPlayer = player2;
 			player1->color = 'B';
@@ -32,7 +32,7 @@ void Round::roundStart(Player *player1, Player *player2) {
 		}
 		else
 		{
-			cout << "You lost the coin toss. Opponent will play first." << endl;
+			cout << "You lost the coin toss. Opponent will play first. Your color: White" << endl;
 			curPlayer = player2;
 			nextPlayer = player1;
 			player1->color = 'W';
@@ -192,10 +192,21 @@ void Round::suspendGame(Board* board, Player* human, Player* comp)
 		out << endl;
 		if (this->nextPlayer == human)
 		{
+			out << "Next Player: " << "Human" << endl;
 		}
-		out << "Next Player: " << this->nextPlayer->name << endl;
-
-		out << "Color: " << this->nextPlayer->color << endl;
+		else
+		{
+			out << "Next Player: " << "Computer" << endl;
+		}
+		if (this->nextPlayer->color == 'B')
+		{
+			out << "Color: " << "Black" << endl;
+		}
+		else
+		{
+			out << "Color: " << "White" << endl;
+		}
+		
 
 		out.close();
 
