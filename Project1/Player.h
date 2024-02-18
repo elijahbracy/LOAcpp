@@ -9,6 +9,6 @@ public:
 	int score = 0;
 	virtual void play(Board* board) {};
 	int totalPieces = 12;
-
+	string name;
 	void UpdateNumPieces(Board* board);
 };

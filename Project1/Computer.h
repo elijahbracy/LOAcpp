@@ -3,5 +3,5 @@
 
 class Computer:public Player
 {
-
+	string name = "Computer";
 };

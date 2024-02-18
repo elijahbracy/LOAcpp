@@ -7,6 +7,8 @@ class Human : public Player
 public:
 
 	Human() {};
+	string name = "Human";
+
 private:
 	void play(Board* board) override 
 	{

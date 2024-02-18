@@ -3,6 +3,7 @@
 #include <random>
 #include <algorithm>
 #include <fstream>
+#include <sstream>
 using namespace std;
 
 Round::Round() {};
@@ -178,6 +179,8 @@ void Round::suspendGame(Board* board, Player* human, Player* comp)
 			}
 			out << endl;
 		}
+		
+		out << endl;
 
 		out << "Human:" << endl;
 		out << "Rounds won: " << human->roundsWon << endl;
@@ -187,10 +190,223 @@ void Round::suspendGame(Board* board, Player* human, Player* comp)
 		out << "Rounds won: " << comp->roundsWon << endl;
 		out << "Score: " << comp->score << endl;
 		out << endl;
-		out << "Next Player: " << this->nextPlayer->color << endl;
+		if (this->nextPlayer == human)
+		{
+		}
+		out << "Next Player: " << this->nextPlayer->name << endl;
+
 		out << "Color: " << this->nextPlayer->color << endl;
 
 		out.close();
 
+		this->suspend = true;
 	}
 };
+
+bool Round::resumeGame()
+{
+	cout << "Would you like to resume a game?: ";
+	char response;
+	do
+	{
+		cin >> response;
+
+		response = toupper(response);
+
+		if (response != 'Y' && response != 'N')
+		{
+			cout << "Invalid input. Please enter 'y' for yes or 'n' to start a new game." << endl;
+		}
+
+	} while (response != 'Y' && response != 'N');
+
+	if (response == 'N')
+	{
+		return false;
+	}
+
+	return true;
+};
+
+void Round::loadGameState(Board* board, Player* human, Player* computer)
+{
+	string path = getPath();
+
+	ifstream inFile(path);
+
+	string line;
+
+	// iterate through all lines
+	while (getline(inFile, line))
+	{
+		// when board line found
+		if (line.find("Board:") != string::npos)
+		{
+
+			// get board
+			char newboard[8][8];
+
+			for (int i = 0; i < 8; i++)
+			{
+				//get next line
+				getline(inFile, line);
+
+				
+				for (int j = 0; j < 8; j++)
+				{
+					// make everything uppercase and adjust for whitespace but multiplying j by 2
+					char space = toupper(line[j * 2]);
+					//cout << line[j * 2];
+					
+					// replace 'x's with '.'s
+					if (space == 'X')
+					{
+						newboard[i][j] = '.';
+					}
+
+					else
+					{
+						newboard[i][j] = toupper(line[j * 2]);
+					}
+				}
+				//cout << endl;
+			}
+
+			board->setBoard(newboard);
+		}
+
+		// when human line found, 
+		if (line.find("Human:") != string::npos)
+		{
+			//get next line
+			getline(inFile, line);
+			
+			// look for Rounds won:
+			size_t pos = line.find("Rounds won:");
+
+			// if found, set human rounds won to number after colon
+			if (pos != string::npos)
+			{
+				cout << "human rounds won = " << stoi(line.substr(pos + 12)) << endl;
+				human->roundsWon = stoi(line.substr(pos + 12));
+			}
+
+			// get next line for score
+			getline(inFile, line);
+
+			// look for score
+			pos = line.find("Score:");
+
+			// if found, set score
+			if (pos != string::npos)
+			{
+				cout << "human score = " << stoi(line.substr(pos + 7)) << endl;
+				human->roundsWon = stoi(line.substr(pos + 7));
+			}
+		}
+
+		// when computer line found
+		if (line.find("Computer:") != string::npos)
+		{
+			//get next line
+			getline(inFile, line);
+
+			// look for Rounds won:
+			size_t pos = line.find("Rounds won:");
+
+			// if found, set human rounds won to number after colon
+			if (pos != string::npos)
+			{
+				cout << "comp rounds won = " << stoi(line.substr(pos + 12)) << endl;
+				computer->roundsWon = stoi(line.substr(pos + 12));
+			}
+
+			// get next line for score
+			getline(inFile, line);
+
+			// look for score
+			pos = line.find("Score:");
+
+			// if found, set score
+			if (pos != string::npos)
+			{
+				cout << "computer score = " << stoi(line.substr(pos + 7)) << endl;
+				computer->roundsWon = stoi(line.substr(pos + 7));
+			}
+		}
+
+		// when next player line found:
+		if (line.find("Next player:") != string::npos)
+		{
+			// look for player type:
+			size_t pos = line.find("Next player:");
+
+			cout << line.substr(pos + 13) << endl;
+			if (line.substr(pos + 13) == "Human")
+			{
+				cout << "current player = human" << endl;
+				this->curPlayer = human;
+				this->nextPlayer = computer;
+			}
+
+			else
+			{
+				this->curPlayer = computer;
+				this->nextPlayer = human;
+			}
+		}
+
+		// look for color
+		
+		if (line.find("Color:") != string::npos)
+		{
+			// look for player type:
+			size_t pos = line.find("Color:");
+
+			cout << line.substr(pos + 7) << endl;
+			if (line.substr(pos + 7) == "Black")
+			{
+				cout << "current player color = black" << endl;
+				this->curPlayer->color = 'B';
+				this->nextPlayer->color = 'W';
+			}
+
+			else
+			{
+				this->curPlayer->color = 'W';
+				this->nextPlayer->color = 'B';
+			}
+		}
+	}
+	cout << "game state loaded." << endl;
+	this->resumingGame = true;
+}
+
+string Round::getPath()
+{
+	cout << "Please enter filename. (ex. file.txt)" << endl;
+
+	string path;
+	bool workingPath;
+	do
+	{
+		cin >> path;
+
+		ifstream inFile(path);
+
+		if (!inFile.is_open())
+		{
+			cerr << "Error opening file." << endl;
+			workingPath = false;
+			cout << "please try entering filename again. try specifying whole path (ex C:/Desktop/file.txt)" << endl;
+		}
+		else 
+		{
+			workingPath = true;
+			inFile.close();
+		}
+
+	} while (!workingPath);
+
+	return path;
+}

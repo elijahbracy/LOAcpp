@@ -13,6 +13,12 @@ int main() {
 	// added for further modularity of how many players in a game, just 2 will be used for now
 	vector<Player*> players = { p1, p2 };
 
+	//ask to resume game on startup
+	if (round.resumeGame())
+	{
+		round.loadGameState(board, p1, p2);
+		board->printBoard();
+	}
 	//game loop
 	do {
 		//if first turn and not continuing game, initialize board and round
@@ -57,7 +63,7 @@ int main() {
 				continue;
 			}
 
-			// else, annouce tournament result
+			// else, announce tournament result
 			break;
 		}
 
@@ -70,9 +76,13 @@ int main() {
 		// get next player
 		round.nextPlayer = round.GetNextPlayer(players, round.nextPlayer);
 
-	} while (round.playAgain); //TODO: while()
+	} while (round.playAgain);
 
 	// announce tournament ending stats, skip if suspending game
-	tournament.announceTournamentResult(round.curPlayer, round.nextPlayer);
+	if (!round.suspend)
+	{
+		tournament.announceTournamentResult(round.curPlayer, round.nextPlayer);
+	}
+	
 
 }

@@ -5,15 +5,16 @@ W x x x x x B W
 W x x x x x x W 
 W x x x x x x W 
 W x x x x x x W 
-W x x x x x x W 
+x x W x x x x W 
 x x x x x x x x 
+
 Human:
-Rounds won: 0
+Rounds won: 15
 Score: 0
 
 Computer: 
 Rounds won: 0
 Score: 0
 
-Next Player: W
-Color: W
+Next Player: B
+Color: B
