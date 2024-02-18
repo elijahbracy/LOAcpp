@@ -1,5 +1,6 @@
 #include "Board.h"
 #include "Round.h"
+#include <string>
 
 using namespace std;
 
@@ -7,6 +8,63 @@ Board::Board()
 	{
 
 	}
+
+vector<string> Board::getPossibleMoves(char curColor)
+{
+	vector<string> possibleMoves;
+
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			if (board[i][j] == curColor)
+			{
+				// iterate through every possible destination for piece
+				for (int k = 0; k < 8; k++)
+				{
+					for (int l = 0; l < 8; l++)
+					{
+						string move = generateMoveString(i, j, k, l);
+						
+						// call isvalid on every possible move
+						if (isValid(move, curColor))
+						{
+							//if valid, push move back into possible move vector
+							possibleMoves.push_back(move);
+						}
+					}
+				}
+			}
+		}
+	}
+
+};
+
+string Board::generateMoveString(int originRow, int originCol, int destinationRow, int destinationCol)
+{
+	string move;
+
+	// build out move string, starting with origin col char & row number, followed by "->", then destination col char and row number
+	// function starts at destination 0,0 and goes to 7,7
+	
+	// convert origin col num to char, indexing starts at A
+	move += static_cast<char>('A' + originCol);
+
+	// add 1 to origin to since indexing starts at 1
+	move += to_string(originRow + 1);
+
+	// add ->
+	move += "->";
+
+	// add destination in same way as origin
+	move += static_cast<char>('A' + destinationCol);
+	move += to_string(destinationRow + 1);
+
+	cout << move;
+
+	return move;
+
+};
 
 void Board::setBoard(const char (&newBoard)[8][8])
 {
