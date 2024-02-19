@@ -1,6 +1,6 @@
 #include "Board.h"
 #include "Round.h"
-
+#include "string"
 using namespace std;
 
 Board::Board()
@@ -45,12 +45,22 @@ string Board::generateMoveString(int originRow, int originCol, int destinationRo
 
 	// build out move string, starting with origin col char & row number, followed by "->", then destination col char and row number
 	// function starts at destination 0,0 and goes to 7,7
-	
+
 	// convert origin col num to char, indexing starts at A
 	move += static_cast<char>('A' + originCol);
 
 	// add 1 to origin to since indexing starts at 1
 	move += to_string(originRow + 1);
+
+	move += '->';
+
+	// add move destination is same way as origin
+	move += static_cast<char>('A' + destinationCol);
+	move += std::to_string(destinationRow + 1);
+
+	return move;
+
+}
 
 void Board::setBoard(const char (&newBoard)[8][8])
 {
