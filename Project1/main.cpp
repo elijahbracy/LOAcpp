@@ -33,7 +33,7 @@ int main() {
 		}
 
 		// print board
-		board->printBoard();
+		//board->printBoard();
 
 		// have player make their turn
 		round.curPlayer->play(board);

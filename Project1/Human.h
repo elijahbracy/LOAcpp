@@ -12,7 +12,7 @@ public:
 private:
 	void play(Board* board) override 
 	{
-		
+		board->printBoard();
 		string move;
 		bool validMove;
 		do
@@ -27,6 +27,7 @@ private:
 			}
 			cout << "invalid" << endl;
 		} while (!validMove);
+		board->printBoard();
 	};
 
 

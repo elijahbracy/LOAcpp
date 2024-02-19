@@ -9,6 +9,59 @@ Board::Board()
 
 	}
 
+pair<string, int> Board::gaugeMove(string move, char curColor, char opColor, int threatLevel, vector<string> opponentsMoves)
+{
+	Board* buffBoard = new Board;
+
+	copyBoard(buffBoard->board);
+
+	//buffBoard->printBoard();
+	// 
+	// "test" move
+	buffBoard->MakeMove(move, curColor);
+	
+	// if after move, total groups is 1, winning move found
+	if (buffBoard->CountGroups(curColor) == 1)
+	{
+		return make_pair(move, 1);
+	}
+
+	// after move, check opponents moves again, see if threat level went down
+	vector<pair<string, int>> opponentsMovesGauged;
+
+	// judge each move, add it vector
+	for (int i = 0; i < opponentsMoves.size(); i++)
+	{
+		opponentsMovesGauged.push_back(gaugeMove(opponentsMoves[i], curColor, opColor, 0));
+	}
+
+	// sort vector based on smallest int, ie, most effective move
+	sort(opponentsMovesGauged.begin(), opponentsMovesGauged.end(), [](pair<string, int>& left, pair<string, int>& right) {return left.second < right.second; });
+
+	// create default for threat level comparison
+	int newThreatLevel;
+
+	if (opponentsMovesGauged[0])
+
+	// if opponents win is imminent, attempt thwart
+[[	if (threatLevel == 1 && opponentsMovesGauged[0].second > 1)
+	{
+		//thwart happened
+		return make_pair(move, 2);
+	}
+	return make_pair(move, 3);
+
+};
+
+void Board::copyBoard(char buffBoard[][8])
+{
+	for (int i = 0; i < 8; ++i) {
+		for (int j = 0; j < 8; ++j) {
+			buffBoard[i][j] = board[i][j];
+		}
+	}
+};
+
 vector<string> Board::getPossibleMoves(char curColor)
 {
 	vector<string> possibleMoves;

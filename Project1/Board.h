@@ -2,6 +2,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
 class Board 
@@ -15,9 +16,13 @@ public:
 
 	const char(*getBoard())[8];
 
+	void copyBoard(char buffBoard[][8]);
+
 	vector<string> getPossibleMoves(char curColor);
 
 	string generateMoveString(int originRow, int originCol, int destinationRow, int destinationCol);
+
+	pair<string, int> gaugeMove(string move, char curColor, char opColor, int threatLevel, vector<string> opponentsMoves = {});
 
 	void MakeMove(string move, char curColor);
 
