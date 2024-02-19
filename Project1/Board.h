@@ -15,8 +15,6 @@ public:
 
 	const char(*getBoard())[8];
 
-	void copyBoard(char buffBoard[][8]);
-
 	vector<string> getPossibleMoves(char curColor);
 
 	string generateMoveString(int originRow, int originCol, int destinationRow, int destinationCol);
