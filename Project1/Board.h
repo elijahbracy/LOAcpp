@@ -15,6 +15,12 @@ public:
 
 	const char(*getBoard())[8];
 
+	void copyBoard(char buffBoard[][8]);
+
+	vector<string> getPossibleMoves(char curColor);
+
+	string generateMoveString(int originRow, int originCol, int destinationRow, int destinationCol);
+
 	void MakeMove(string move, char curColor);
 
 	bool isValid(string move, char curColor);
@@ -30,8 +36,6 @@ public:
 	pair<int, int> parseOrigin(string move);
 
 	pair<int, int> parseDestination(string move);
-
-	//void Update(vector<Player*> players); // TODO update number of pieces each player has
 
 	int CountPieces(char color);
 

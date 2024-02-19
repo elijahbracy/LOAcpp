@@ -8,6 +8,15 @@ Board::Board()
 
 	}
 
+
+void Board::copyBoard(char buffBoard[][8])
+{
+	for (int i = 0; i < 8; ++i) {
+		for (int j = 0; j < 8; ++j) {
+			buffBoard[i][j] = board[i][j];
+		}
+	}
+
 void Board::setBoard(const char (&newBoard)[8][8])
 {
 	for (int row = 0; row < 8; row++)
