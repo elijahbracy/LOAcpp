@@ -16,6 +16,7 @@ void Board::copyBoard(char buffBoard[][8])
 			buffBoard[i][j] = board[i][j];
 		}
 	}
+}
 
 void Board::setBoard(const char (&newBoard)[8][8])
 {
