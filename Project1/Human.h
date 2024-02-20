@@ -10,9 +10,9 @@ public:
 	string name = "Human";
 
 private:
-	void play(Board* board) override 
+	void play(Board* board) override
 	{
-		
+		board->printBoard();
 		string move;
 		bool validMove;
 		do
@@ -27,6 +27,7 @@ private:
 			}
 			cout << "invalid" << endl;
 		} while (!validMove);
+		board->printBoard();
 	};
 
 

@@ -9,7 +9,7 @@ using namespace std;
 Round::Round() {};
 
 
-void Round::roundStart(Player *player1, Player *player2) {
+void Round::roundStart(Player* player1, Player* player2) {
 
 	//if players have tie, flip coin, else player with more wins goes first
 	if (player1->roundsWon == player2->roundsWon) {
@@ -55,27 +55,22 @@ void Round::announceRoundWin(Player* curPlayer, Player* nextPlayer)
 
 Player* Round::GetNextPlayer(vector<Player*>& playerList, Player* curPlayer)
 {
-	// get index of current player
-	auto it = find(playerList.begin(), playerList.end(), curPlayer);
+	Player* buff = this->curPlayer;
 
-	// it curPlayer found
-	if (it != playerList.end())
-	{
-		// get index of cuPlayer within vector
-		int index = distance(playerList.begin(), it);
+	this->curPlayer = this->nextPlayer;
 
-		// move to next player, wrapping around if at end
-		index = (index + 1) % playerList.size();
+	this->nextPlayer = buff;
 
-		// return pointer to next player
-		cout << "next player: " << playerList[index]->color << endl;
+	return buff;
+}
 
-		return playerList[index];
-	}
+void Round::SwitchPlayers()
+{
+	Player* buff = this->curPlayer;
 
-	// if current player not found, log and return nullptr
-	cout << "error: current player not found" << endl;
-	return nullptr;
+	this->curPlayer = this->nextPlayer;
+
+	this->nextPlayer = buff;
 }
 
 void Round::Score(Player* winner, int numOpponentPieces)
@@ -175,11 +170,11 @@ void Round::suspendGame(Board* board, Player* human, Player* comp)
 				{
 					out << boardPtr[i][j] << ' ';
 				}
-				
+
 			}
 			out << endl;
 		}
-		
+
 		out << endl;
 
 		out << "Human:" << endl;
@@ -206,7 +201,7 @@ void Round::suspendGame(Board* board, Player* human, Player* comp)
 		{
 			out << "Color: " << "White" << endl;
 		}
-		
+
 
 		out.close();
 
@@ -262,13 +257,13 @@ void Round::loadGameState(Board* board, Player* human, Player* computer)
 				//get next line
 				getline(inFile, line);
 
-				
+
 				for (int j = 0; j < 8; j++)
 				{
 					// make everything uppercase and adjust for whitespace but multiplying j by 2
 					char space = toupper(line[j * 2]);
 					//cout << line[j * 2];
-					
+
 					// replace 'x's with '.'s
 					if (space == 'X')
 					{
@@ -291,7 +286,7 @@ void Round::loadGameState(Board* board, Player* human, Player* computer)
 		{
 			//get next line
 			getline(inFile, line);
-			
+
 			// look for Rounds won:
 			size_t pos = line.find("Rounds won:");
 
@@ -368,7 +363,7 @@ void Round::loadGameState(Board* board, Player* human, Player* computer)
 		}
 
 		// look for color
-		
+
 		if (line.find("Color:") != string::npos)
 		{
 			// look for player type:
@@ -411,7 +406,7 @@ string Round::getPath()
 			workingPath = false;
 			cout << "please try entering filename again. try specifying whole path (ex C:/Desktop/file.txt)" << endl;
 		}
-		else 
+		else
 		{
 			workingPath = true;
 			inFile.close();

@@ -1,12 +1,66 @@
 #include "Board.h"
 #include "Round.h"
-#include "string"
+#include <string>
+
 using namespace std;
 
 Board::Board()
-	{
+{
 
+}
+
+pair<string, int> Board::gaugeMove(string move, char curColor, char opColor, int threatLevel, vector<string> opponentsMoves)
+{
+	Board* buffBoard = new Board;
+
+	copyBoard(buffBoard->board);
+
+	//buffBoard->printBoard();
+	// 
+	// "test" move
+	buffBoard->MakeMove(move, curColor);
+
+	// if after move, total groups is 1, winning move found
+	if (buffBoard->CountGroups(curColor) == 1)
+	{
+		return make_pair(move, 1);
 	}
+
+	// after move, check opponents moves again, see if threat level went down
+	vector<pair<string, int>> opponentsMovesGauged;
+
+	// judge each move, add it vector
+	for (int i = 0; i < opponentsMoves.size(); i++)
+	{
+		opponentsMovesGauged.push_back(gaugeMove(opponentsMoves[i], curColor, opColor, 0));
+	}
+
+	// sort vector based on smallest int, ie, most effective move
+	sort(opponentsMovesGauged.begin(), opponentsMovesGauged.end(), [](pair<string, int>& left, pair<string, int>& right) {return left.second < right.second; });
+
+	// create default for threat level comparison
+	int newThreatLevel;
+
+	if (opponentsMovesGauged[0])
+
+		// if opponents win is imminent, attempt thwart
+		[[ if (threatLevel == 1 && opponentsMovesGauged[0].second > 1)
+	{
+		//thwart happened
+		return make_pair(move, 2);
+	}
+	return make_pair(move, 3);
+
+};
+
+void Board::copyBoard(char buffBoard[][8])
+{
+	for (int i = 0; i < 8; ++i) {
+		for (int j = 0; j < 8; ++j) {
+			buffBoard[i][j] = board[i][j];
+		}
+	}
+};
 
 vector<string> Board::getPossibleMoves(char curColor)
 {
@@ -24,7 +78,7 @@ vector<string> Board::getPossibleMoves(char curColor)
 					for (int l = 0; l < 8; l++)
 					{
 						string move = generateMoveString(i, j, k, l);
-						
+
 						// call isvalid on every possible move
 						if (isValid(move, curColor))
 						{
@@ -52,17 +106,18 @@ string Board::generateMoveString(int originRow, int originCol, int destinationRo
 	// add 1 to origin to since indexing starts at 1
 	move += to_string(originRow + 1);
 
-	move += '->';
+	// add ->
+	move += "->";
 
-	// add move destination is same way as origin
+	// add destination in same way as origin
 	move += static_cast<char>('A' + destinationCol);
-	move += std::to_string(destinationRow + 1);
+	move += to_string(destinationRow + 1);
 
 	return move;
 
-}
+};
 
-void Board::setBoard(const char (&newBoard)[8][8])
+void Board::setBoard(const char(&newBoard)[8][8])
 {
 	for (int row = 0; row < 8; row++)
 	{
@@ -73,7 +128,7 @@ void Board::setBoard(const char (&newBoard)[8][8])
 	}
 };
 
-const char (*Board::getBoard())[8]
+const char(*Board::getBoard())[8]
 {
 	return board;
 }
@@ -117,35 +172,35 @@ bool Board::isValid(string move, char curColor)
 	pair<int, int> origin = parseOrigin(move);
 	pair<int, int> destination = parseDestination(move);
 
-	cout << board[origin.first][origin.second];
+	//cout << board[origin.first][origin.second];
 	char originSpace = board[origin.first][origin.second];
 	char destinationSpace = board[destination.first][destination.second];
 
 	// steps must equal number of pieces on that line
 	if (SpacesToMove(origin, destination) != PiecesOnLine(origin, destination))
 	{
-		cout << "steps must equal number of pieces on that line" << endl;
+		//cout << "steps must equal number of pieces on that line" << endl;
 		return false;
 	}
 
 	// origin coordinate has piece that belongs to player
 	if (originSpace != curColor)
 	{
-		cout << "origin coordinate must have piece that belongs to you" << endl;
+		//cout << "origin coordinate must have piece that belongs to you" << endl;
 		return false;
 	}
 
 	// desination is empty or has enemy piece
 	if (destinationSpace == curColor)
 	{
-		cout << "destination coordinate must be empty or have enemy piece" << endl;
+		//cout << "destination coordinate must be empty or have enemy piece" << endl;
 		return false;
 	}
 
 	// and path between has no enemy pieces
 	if (PiecesInWay(origin, destination, curColor))
 	{
-		cout << "path between origin and coordinate must have no enemy pieces" << endl;
+		//cout << "path between origin and coordinate must have no enemy pieces" << endl;
 		return false;
 	}
 
@@ -341,7 +396,7 @@ void Board::FloodFill(int row, int col, char color, vector<vector<bool>>& visite
 	visited[row][col] = true;
 
 	// recursively check adjacent spaces
-	FloodFill(row - 1, col, color, visited); 
+	FloodFill(row - 1, col, color, visited);
 	FloodFill(row + 1, col, color, visited);
 	FloodFill(row, col - 1, color, visited);
 	FloodFill(row, col + 1, color, visited);
@@ -355,15 +410,15 @@ void Board::FloodFill(int row, int col, char color, vector<vector<bool>>& visite
 pair<int, int> Board::parseOrigin(string move) {
 	int row = move[1] - '0'; // get int from ascii number
 	row -= 1; // subtract 8 and flip sign to get proper row
-	int col = lettersToNumbers[move[0]]; //use map to get column number
-	cout << "coordinate of origin is: [" << row << "][" << col << ']' << endl;
+	int col = lettersToNumbers[tolower(move[0])]; //use map to get column number
+	//cout << "coordinate of origin is: [" << row << "][" << col << ']' << endl;
 	return make_pair(row, col);
 };
 
 pair<int, int> Board::parseDestination(string move) {
 	int row = move[5] - '0'; // get int from ascii number
 	row -= 1; // subtract 8 and flip sign to get proper row
-	int col = lettersToNumbers[move[4]]; //use map to get column number
-	cout << "coordinate of destination is: [" << row << "][" << col << ']' << endl;
+	int col = lettersToNumbers[tolower(move[4])]; //use map to get column number
+	//cout << "coordinate of destination is: [" << row << "][" << col << ']' << endl;
 	return make_pair(row, col);
 };
