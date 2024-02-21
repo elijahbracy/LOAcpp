@@ -17,11 +17,13 @@ int main() {
 	//ask to resume game on startup
 	if (round.resumeGame())
 	{
+		// parameters probably unnecessary
 		round.loadGameState(board, p1, p2);
 	}
 
 	//game loop
 	do {
+
 		//if first turn and not continuing game, initialize board and round
 		if (round.turnsPlayed == 0 && round.resumingGame == false)
 		{
@@ -35,6 +37,11 @@ int main() {
 		// print board
 		//board->printBoard();
 
+		//display current player
+		cout << "Current player: ";
+		round.curPlayer->displayName();
+		cout << " Color: " << round.curPlayer->getColor() << endl;
+
 		// have player make their turn
 		round.curPlayer->play(board);
 
@@ -45,7 +52,7 @@ int main() {
 		}
 
 		// check for win
-		if (board->CountGroups(round.curPlayer->color) == 1)
+		if (board->CountGroups(round.curPlayer->getColor()) == 1)
 		{
 			// score round
 			round.Score(round.curPlayer, round.nextPlayer->totalPieces);
@@ -73,6 +80,7 @@ int main() {
 		round.turnsPlayed += 1;
 
 		// ask if they would like to suspend game
+		// parameters unneeccessacry
 		round.suspendGame(board, p1, p2);
 
 		// get next player

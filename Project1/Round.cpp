@@ -11,13 +11,30 @@ Round::Round() {};
 
 void Round::roundStart(Player* player1, Player* player2) {
 
-	//if players have tie, flip coin, else player with more wins goes first
+	// if players have tie, flip coin, else player with more wins goes first
 	if (player1->roundsWon == player2->roundsWon) {
-		char coinResult = 'h';//coinFlip();
+		char coinResult = 'h'; //coinFlip();
 
-		cout << "Call coin toss (H for heads, T for tails): ";
 		char guess;
-		cin >> guess;
+
+		// validation for guess
+		while (true) {
+			cout << "Call coin toss (H for heads, T for tails): ";
+			cin >> guess;
+
+			guess = tolower(guess);
+
+			// check validity
+			if (guess == 'h' || guess == 't') {
+				break;
+			}
+			else {
+				cout << "Invalid input. Please enter 'H' for heads or 'T' for tails." << endl;
+			}
+		}
+
+		// echo input
+		cout << "You called: " << guess << endl;
 
 		cout << "Result of coin toss: " << coinResult << endl;
 
@@ -26,8 +43,8 @@ void Round::roundStart(Player* player1, Player* player2) {
 			cout << "You won the coin toss. You will play first. Your color: Black" << endl;
 			curPlayer = player1;
 			nextPlayer = player2;
-			player1->color = 'B';
-			player2->color = 'W';
+			player1->setColor('B');
+			player2->setColor('W');
 
 		}
 		else
@@ -35,21 +52,31 @@ void Round::roundStart(Player* player1, Player* player2) {
 			cout << "You lost the coin toss. Opponent will play first. Your color: White" << endl;
 			curPlayer = player2;
 			nextPlayer = player1;
-			player1->color = 'W';
-			player2->color = 'B';
+			player1->setColor('W');
+			player2->setColor('B');
 		}
 	}
 	else {
-		curPlayer = (player1->roundsWon < player2->roundsWon) ? player1 : player2; // gpt for ternary operator syntax
-		nextPlayer = (player1->roundsWon > player2->roundsWon) ? player1 : player2;
+		curPlayer = (player1->roundsWon > player2->roundsWon) ? player1 : player2; // gpt for ternary operator syntax
+		nextPlayer = (player1->roundsWon < player2->roundsWon) ? player1 : player2;
 	}
 };
 
 void Round::announceRoundWin(Player* curPlayer, Player* nextPlayer)
 {
-	cout << "Player: " << curPlayer->color << " won the round!" << endl;
-	cout << curPlayer->color << " scored " << curPlayer->totalPieces - nextPlayer->totalPieces << " points" << endl;
-	cout << nextPlayer->color << " scored " << "0 points" << endl;
+	curPlayer->displayName(); 
+	cout<< " won the round!" << endl;
+
+
+	curPlayer->displayName();
+	cout << " scored " << curPlayer->totalPieces - nextPlayer->totalPieces << " points" << endl;
+	cout << "Total tournament score after round:" << curPlayer->tournamentScore << endl;
+
+
+	nextPlayer->displayName();
+	cout << " scored " << "0 points" << endl;
+	cout << "Total tournament score after round:" << nextPlayer->tournamentScore << endl;
+	curPlayer->score = 0;
 };
 
 
@@ -77,6 +104,7 @@ void Round::Score(Player* winner, int numOpponentPieces)
 {
 	winner->roundsWon += 1;
 	winner->score += winner->totalPieces - numOpponentPieces;
+	winner->tournamentScore += winner->score;
 };
 
 void Round::PlayAgain()
@@ -98,9 +126,9 @@ void Round::PlayAgain()
 	if (response == 'Y')
 	{
 		this->playAgain = true;
+		return;
 	}
-
-	return;
+	this->playAgain = false;
 
 };
 
@@ -143,8 +171,32 @@ void Round::suspendGame(Board* board, Player* human, Player* comp)
 		// create output file stream object
 		ofstream out;
 
-		// open file
-		out.open("gameState.txt");
+		string filename;
+		bool validFilename = false;
+
+		do {
+			cout << "Please enter a filename for the game save file: ";
+			cin >> filename;
+
+			// Check if the filename is valid by looking for any invalid characters
+			if (filename.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.") == string::npos) {
+				// Filename contains only valid characters
+				validFilename = true;
+			}
+			else {
+				// Invalid filename
+				cout << "Invalid filename. Please use only letters, numbers, underscores, and periods." << endl;
+			}
+		} while (!validFilename);
+
+		// Check if the filename ends with ".txt"
+		if (filename.length() >= 4 && filename.substr(filename.length() - 4) != ".txt") {
+			// If it doesn't end with ".txt", add the extension
+			filename += ".txt";
+		}
+
+		// Open the file with the validated filename
+		out.open(filename);
 
 		// if unable to open display error message
 		if (!out.is_open())
@@ -176,7 +228,6 @@ void Round::suspendGame(Board* board, Player* human, Player* comp)
 		}
 
 		out << endl;
-
 		out << "Human:" << endl;
 		out << "Rounds won: " << human->roundsWon << endl;
 		out << "Score: " << human->score << endl;
@@ -193,7 +244,7 @@ void Round::suspendGame(Board* board, Player* human, Player* comp)
 		{
 			out << "Next player: " << "Computer" << endl;
 		}
-		if (this->nextPlayer->color == 'B')
+		if (this->nextPlayer->getColor() == 'B')
 		{
 			out << "Color: " << "Black" << endl;
 		}
@@ -293,7 +344,7 @@ void Round::loadGameState(Board* board, Player* human, Player* computer)
 			// if found, set human rounds won to number after colon
 			if (pos != string::npos)
 			{
-				cout << "human rounds won = " << stoi(line.substr(pos + 12)) << endl;
+				//cout << "human rounds won = " << stoi(line.substr(pos + 12)) << endl;
 				human->roundsWon = stoi(line.substr(pos + 12));
 			}
 
@@ -306,8 +357,8 @@ void Round::loadGameState(Board* board, Player* human, Player* computer)
 			// if found, set score
 			if (pos != string::npos)
 			{
-				cout << "human score = " << stoi(line.substr(pos + 7)) << endl;
-				human->roundsWon = stoi(line.substr(pos + 7));
+				//cout << "human score = " << stoi(line.substr(pos + 7)) << endl;
+				human->tournamentScore = stoi(line.substr(pos + 7));
 			}
 		}
 
@@ -323,7 +374,7 @@ void Round::loadGameState(Board* board, Player* human, Player* computer)
 			// if found, set human rounds won to number after colon
 			if (pos != string::npos)
 			{
-				cout << "comp rounds won = " << stoi(line.substr(pos + 12)) << endl;
+				//cout << "comp rounds won = " << stoi(line.substr(pos + 12)) << endl;
 				computer->roundsWon = stoi(line.substr(pos + 12));
 			}
 
@@ -336,8 +387,8 @@ void Round::loadGameState(Board* board, Player* human, Player* computer)
 			// if found, set score
 			if (pos != string::npos)
 			{
-				cout << "computer score = " << stoi(line.substr(pos + 7)) << endl;
-				computer->roundsWon = stoi(line.substr(pos + 7));
+				//cout << "computer score = " << stoi(line.substr(pos + 7)) << endl;
+				computer->tournamentScore = stoi(line.substr(pos + 7));
 			}
 		}
 
@@ -347,10 +398,10 @@ void Round::loadGameState(Board* board, Player* human, Player* computer)
 			// look for player type:
 			size_t pos = line.find("Next player:");
 
-			cout << line.substr(pos + 13) << endl;
+			//cout << line.substr(pos + 13) << endl;
 			if (line.substr(pos + 13) == "Human")
 			{
-				cout << "current player = human" << endl;
+				//cout << "current player = human" << endl;
 				this->curPlayer = human;
 				this->nextPlayer = computer;
 			}
@@ -369,18 +420,18 @@ void Round::loadGameState(Board* board, Player* human, Player* computer)
 			// look for player type:
 			size_t pos = line.find("Color:");
 
-			cout << line.substr(pos + 7) << endl;
+			//cout << line.substr(pos + 7) << endl;
 			if (line.substr(pos + 7) == "Black")
 			{
-				cout << "current player color = black" << endl;
-				this->curPlayer->color = 'B';
-				this->nextPlayer->color = 'W';
+				//cout << "current player color = black" << endl;
+				this->curPlayer->setColor('B');
+				this->nextPlayer->setColor('W');
 			}
 
 			else
 			{
-				this->curPlayer->color = 'W';
-				this->nextPlayer->color = 'B';
+				this->curPlayer->setColor('W');
+				this->nextPlayer->setColor('B');
 			}
 		}
 	}

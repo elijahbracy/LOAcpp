@@ -1,7 +1,7 @@
 Board:
-x B B B B B x x 
+x B W B B B x x 
 W x x x x x x W 
-W x x x x x B W 
+x x x x x x B W 
 W x x x x x x W 
 W x x x x x x W 
 W x x x x x x W 
@@ -16,5 +16,5 @@ Computer:
 Rounds won: 0
 Score: 0
 
-Next player: Computer
-Color: White
+Next player: Human
+Color: Black

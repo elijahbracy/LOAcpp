@@ -22,7 +22,19 @@ public:
 
 	string generateMoveString(int originRow, int originCol, int destinationRow, int destinationCol);
 
-	pair<string, int> gaugeMove(string move, char curColor, char opColor, int threatLevel, vector<string> opponentsMoves = {});
+	bool isWinningMove(string move, char curColor);
+
+	bool isThwart(string move, char curColor, char opponentColor);
+
+	bool isBlock(string move, char curColor, char opponentColor);
+
+	bool isCapture(string move, char curColor, char opponentColor);
+
+	bool isConnectingGroups(string move, char curColor);
+
+	bool isCondensingGroups(string move, char curColor);
+
+	bool isStall(string move, char curColor, char opponentColor);
 
 	void MakeMove(string move, char curColor);
 
@@ -49,6 +61,8 @@ public:
 	void FloodFill(int row, int col, char color, vector<vector<bool>>& visited);
 
 	map<char, int> lettersToNumbers = { {'a',0}, {'b', 1}, {'c',2}, {'d',3} , {'e',4} , {'f',5} , {'g',6} , {'h',7} }; // mapping columns to array notation
+
+	//map<int, int> indexToCoordinate = { {7,1}, {6,2}, {5,3}, {4,4}, {3,5},  }
 	//map<int, int> numbersTo
 
 	char defaultBoard[8][8] = {
@@ -64,14 +78,14 @@ public:
 
 private:
 	char board[8][8] = {
-		{'.', 'B', 'B', 'B', 'B', 'B', '.', '.'},
-		{'W', '.', '.', '.', '.', '.', '.', 'W'},
-		{'W', '.', '.', '.', '.', '.', 'B', 'W'},
-		{'W', '.', '.', '.', '.', '.', '.', 'W'},
-		{'W', '.', '.', '.', '.', '.', '.', 'W'},
-		{'W', '.', '.', '.', '.', '.', '.', 'W'},
-		{'W', '.', '.', '.', '.', '.', '.', 'W'},
-		{'.', '.', '.', '.', '.', '.', '.', '.'}
+		{'.', '.', '.', '.', '.', '.', '.', '.'},
+		{'.', '.', '.', '.', '.', '.', '.', '.'},
+		{'.', '.', '.', '.', '.', '.', '.', '.'},
+		{'.', '.', '.', '.', '.', '.', '.', '.'},
+		{'.', '.', '.', '.', '.', '.', '.', '.'},
+		{'.', '.', '.', '.', '.', '.', '.', '.'},
+		{'.', '.', '.', '.', '.', '.', '.', '.'},
+		{'W', '.', '.', '.', '.', '.', '.', '.'}
 	};
 
 

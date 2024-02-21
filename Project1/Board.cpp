@@ -9,48 +9,243 @@ Board::Board()
 
 }
 
-pair<string, int> Board::gaugeMove(string move, char curColor, char opColor, int threatLevel, vector<string> opponentsMoves)
+bool Board::isWinningMove(string move, char curColor)
 {
 	Board* buffBoard = new Board;
 
 	copyBoard(buffBoard->board);
 
-	//buffBoard->printBoard();
-	// 
 	// "test" move
 	buffBoard->MakeMove(move, curColor);
 
 	// if after move, total groups is 1, winning move found
 	if (buffBoard->CountGroups(curColor) == 1)
 	{
-		return make_pair(move, 1);
+		delete buffBoard;
+		return true;
 	}
 
-	// after move, check opponents moves again, see if threat level went down
-	vector<pair<string, int>> opponentsMovesGauged;
+	delete buffBoard;
+	return false;
 
-	// judge each move, add it vector
-	for (int i = 0; i < opponentsMoves.size(); i++)
+};
+
+bool Board::isConnectingGroups(string move, char curColor)
+{
+	Board* buffBoard = new Board;
+
+	copyBoard(buffBoard->board);
+
+	// "test" move
+	buffBoard->MakeMove(move, curColor);
+
+	// if number of groups is 2 less than previous number of groups, 2 seperate groups were connected
+	if ((buffBoard->CountGroups(curColor) + 1) < CountGroups(curColor))
 	{
-		opponentsMovesGauged.push_back(gaugeMove(opponentsMoves[i], curColor, opColor, 0));
+		delete buffBoard;
+		return true;
 	}
 
-	// sort vector based on smallest int, ie, most effective move
-	sort(opponentsMovesGauged.begin(), opponentsMovesGauged.end(), [](pair<string, int>& left, pair<string, int>& right) {return left.second < right.second; });
+	delete buffBoard;
+	return false;
+};
 
-	// create default for threat level comparison
-	int newThreatLevel;
+bool Board::isThwart(string move, char curColor, char opponentColor) // tests move, returns true if move doesnt result in giving opponent win
+{
+	Board* buffBoard = new Board;
 
-	if (opponentsMovesGauged[0])
+	copyBoard(buffBoard->board);
 
-		// if opponents win is imminent, attempt thwart
-		[[ if (threatLevel == 1 && opponentsMovesGauged[0].second > 1)
+	// "test" move
+	buffBoard->MakeMove(move, curColor);
+
+	// get opponents new possible moves and see if win is still imminent
+	vector<string> opponentMoves = buffBoard->getPossibleMoves(opponentColor);
+
+	for (string move : opponentMoves)
 	{
-		//thwart happened
-		return make_pair(move, 2);
+		if (buffBoard->isWinningMove(move, opponentColor))
+		{
+			delete buffBoard;
+			return false;
+		}
 	}
-	return make_pair(move, 3);
 
+	delete buffBoard;
+	return true;
+};
+
+bool Board::isCondensingGroups(string move, char curColor)
+{
+	Board* buffBoard = new Board;
+
+	copyBoard(buffBoard->board);
+
+	// "test" move
+	buffBoard->MakeMove(move, curColor);
+
+	// if number of groups is 2 less than previous number of groups, 2 seperate groups were connected
+	if (buffBoard->CountGroups(curColor) < CountGroups(curColor))
+	{
+		delete buffBoard;
+		return true;
+	}
+
+	delete buffBoard;
+	return false;
+};
+
+bool Board::isStall(string move, char curColor, char opponentColor)
+{
+	Board* buffBoard = new Board;
+
+	copyBoard(buffBoard->board);
+
+	// "test" move
+	buffBoard->MakeMove(move, curColor);
+
+	// if we didn't accidentally give opponent the win
+	if (buffBoard->CountGroups(opponentColor) != 1)
+	{
+		delete buffBoard;
+		return true;
+	}
+
+	delete buffBoard;
+	return false;
+}
+
+bool Board::isCapture(string move, char curColor, char opponentColor)
+{
+	Board* buffBoard = new Board;
+
+	copyBoard(buffBoard->board);
+
+	// "test" move
+	buffBoard->MakeMove(move, curColor);
+
+	// get opponents new possible moves and see if win is still imminent
+	vector<string> opponentMoves = buffBoard->getPossibleMoves(opponentColor);
+
+
+	if (buffBoard->CountPieces(opponentColor) < CountPieces(opponentColor))
+	{
+		delete buffBoard;
+		return true;
+	}
+
+	delete buffBoard;
+	return false;
+};
+
+
+bool Board::isBlock(string move, char curColor, char opponentColor) //TODO: move check for giving opponent win to just using isThwart
+{
+	Board* buffBoard = new Board;
+
+	copyBoard(buffBoard->board);
+
+	string moveBuff = move;
+
+	// if destination col is B or G and the char next to it is an opponents piece, block found
+	if (moveBuff[4] == 'B')
+	{
+		moveBuff[4] = 'A';
+		if (board[parseDestination(moveBuff).first][parseDestination(moveBuff).second] == opponentColor)
+		{
+			// and the move doesnt give opponent win
+
+			buffBoard->MakeMove(move, curColor);
+			vector<string> opponentMoves = buffBoard->getPossibleMoves(opponentColor);
+
+			for (string move : opponentMoves)
+			{
+				if (buffBoard->isWinningMove(move, opponentColor))
+				{
+					delete buffBoard;
+					return false;
+				}
+			}
+			delete buffBoard;
+			return true;
+		}
+		moveBuff[4] = 'B';
+	}
+
+	if (moveBuff[4] == 'G')
+	{
+		moveBuff[4] = 'H';
+		if (board[parseDestination(moveBuff).first][parseDestination(moveBuff).second] == opponentColor)
+		{
+			// and the move doesnt give opponent win
+
+			buffBoard->MakeMove(move, curColor);
+			vector<string> opponentMoves = buffBoard->getPossibleMoves(opponentColor);
+
+			for (string move : opponentMoves)
+			{
+				if (buffBoard->isWinningMove(move, opponentColor))
+				{
+					delete buffBoard;
+					return false;
+				}
+			}
+			delete buffBoard;
+			return true;
+		}
+		moveBuff[4] = 'G';
+	}
+
+	// if destination row is 2 or 7 and the char next to it is an opponents piece, block found
+	if (moveBuff[5] == '2')
+	{
+		moveBuff[5] = '1';
+		if (board[parseDestination(moveBuff).first][parseDestination(moveBuff).second] == opponentColor)
+		{
+			// and the move doesnt give opponent win
+
+			buffBoard->MakeMove(move, curColor);
+			vector<string> opponentMoves = buffBoard->getPossibleMoves(opponentColor);
+
+			for (string move : opponentMoves)
+			{
+				if (buffBoard->isWinningMove(move, opponentColor))
+				{
+					delete buffBoard;
+					return false;
+				}
+			}
+			delete buffBoard;
+			return true;
+		}
+		moveBuff[5] = '2';
+	}
+
+	if (moveBuff[5] == '7')
+	{
+		moveBuff[5] = '8';
+		if (board[parseDestination(moveBuff).first][parseDestination(moveBuff).second] == opponentColor)
+		{
+		
+			buffBoard->MakeMove(move, curColor);
+			vector<string> opponentMoves = buffBoard->getPossibleMoves(opponentColor);
+
+			for (string move : opponentMoves)
+			{
+				if (buffBoard->isWinningMove(move, opponentColor))
+				{
+					delete buffBoard;
+					return false;
+				}
+			}
+			delete buffBoard;
+			return true;
+		}
+		moveBuff[5] = '7';
+	}
+
+	delete buffBoard;
+	return false;
 };
 
 void Board::copyBoard(char buffBoard[][8])
@@ -65,7 +260,6 @@ void Board::copyBoard(char buffBoard[][8])
 vector<string> Board::getPossibleMoves(char curColor)
 {
 	vector<string> possibleMoves;
-
 	for (int i = 0; i < 8; i++)
 	{
 		for (int j = 0; j < 8; j++)
@@ -77,7 +271,7 @@ vector<string> Board::getPossibleMoves(char curColor)
 				{
 					for (int l = 0; l < 8; l++)
 					{
-						string move = generateMoveString(i, j, k, l);
+						string move = generateMoveString(i, j, k, l); 
 
 						// call isvalid on every possible move
 						if (isValid(move, curColor))
@@ -104,14 +298,14 @@ string Board::generateMoveString(int originRow, int originCol, int destinationRo
 	move += static_cast<char>('A' + originCol);
 
 	// add 1 to origin to since indexing starts at 1
-	move += to_string(originRow + 1);
+	move += to_string(abs(originRow - 8));
 
 	// add ->
 	move += "->";
 
 	// add destination in same way as origin
 	move += static_cast<char>('A' + destinationCol);
-	move += to_string(destinationRow + 1);
+	move += to_string(abs(destinationRow - 8));
 
 	return move;
 
@@ -135,10 +329,11 @@ const char(*Board::getBoard())[8]
 
 void Board::printBoard()
 {
+	int rows = 8;
 	cout << " +-----------------+" << endl;
-	for (int row = 7; row >= 0; row--)
+	for (int row = 0; row <= 7; row++)
 	{
-		cout << row + 1 << "| ";
+		cout << rows-- << "| ";
 		for (int col = 0; col < 8; col++)
 		{
 			cout << board[row][col] << " ";
@@ -266,8 +461,8 @@ int Board::PiecesOnLine(pair<int, int> origin, pair<int, int> destination)
 		}
 
 		// start at origin + 1 step in opposite direction, follow to edge going opposite direction
-		x = origin.first + colStep;
-		y = origin.second + rowStep;
+		x = origin.first + (rowStep * -1);
+		y = origin.second + (colStep * -1);
 
 		while (x >= 0 && x < 8 && y >= 0 && y < 8)
 		{
@@ -276,8 +471,8 @@ int Board::PiecesOnLine(pair<int, int> origin, pair<int, int> destination)
 			{
 				numPieces++;
 			}
-			x += colStep;
-			y += rowStep;
+			x += (rowStep * -1);
+			y += (colStep * -1);
 		}
 	}
 
@@ -382,7 +577,7 @@ int Board::CountGroups(char color)
 			}
 		}
 	}
-	cout << "number of groups for " << color << ": " << groups << endl;
+	//cout << "number of groups for " << color << ": " << groups << endl;
 	return groups;
 };
 
@@ -409,7 +604,7 @@ void Board::FloodFill(int row, int col, char color, vector<vector<bool>>& visite
 
 pair<int, int> Board::parseOrigin(string move) {
 	int row = move[1] - '0'; // get int from ascii number
-	row -= 1; // subtract 8 and flip sign to get proper row
+	row = (abs(row - 8)); // subtract 8 and flip sign to get proper row
 	int col = lettersToNumbers[tolower(move[0])]; //use map to get column number
 	//cout << "coordinate of origin is: [" << row << "][" << col << ']' << endl;
 	return make_pair(row, col);
@@ -417,7 +612,7 @@ pair<int, int> Board::parseOrigin(string move) {
 
 pair<int, int> Board::parseDestination(string move) {
 	int row = move[5] - '0'; // get int from ascii number
-	row -= 1; // subtract 8 and flip sign to get proper row
+	row = (abs(row - 8)); // subtract 8 and flip sign to get proper row
 	int col = lettersToNumbers[tolower(move[4])]; //use map to get column number
 	//cout << "coordinate of destination is: [" << row << "][" << col << ']' << endl;
 	return make_pair(row, col);
