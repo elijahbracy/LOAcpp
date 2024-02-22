@@ -6,37 +6,31 @@
 class Round
 {
 public:
-	Round();
-
+	Round() {};
+	~Round() {};
 	void roundStart(Player* p1, Player* p2);
 
-	Player* curPlayer;
-
-	Player* nextPlayer;
-
 	char coinFlip();
-
-	//bool roundOver();
-
-	Player* GetNextPlayer(vector<Player*>& playerList, Player* curPlayer);
 
 	void Score(Player* winner, int numOpponentPieces);
 
 	void SwitchPlayers();
 
-	bool playAgain = false;
-
 	void PlayAgain();
 
-	int turnsPlayed = 0;
+	int getTurnsPlayed() const { return m_turnsPlayed; }
 
-	bool resumingGame = false;
+	void setTurnsPlayed(int a_turnsPlayed) { m_turnsPlayed = a_turnsPlayed; }
+
+	void setResumeGame(bool a_resume) { m_resumingGame = a_resume;}
+	bool getResumeGame() const { return m_resumingGame; }
 
 	void announceRoundWin(Player* curPlayer, Player* nextPlayer);
 
-	bool suspend = false;
+	void setPlayAgain(bool a_playAgain) { m_playAgain = a_playAgain; }
+	bool getPlayAgain() const { return m_playAgain; }
 
-	void suspendGame(Board* board, Player* human, Player* comp);
+	void suspendGame();
 
 	bool resumeGame();
 
@@ -44,6 +38,27 @@ public:
 
 	string getPath();
 
+	void setCurPlayer(Player* a_curPlayer) { m_curPlayer = a_curPlayer; }
+	Player* getCurPlayer() const { return m_curPlayer; }
+
+	void setNextPlayer(Player* a_nextPlayer) { m_nextPlayer = a_nextPlayer; }
+	Player* getNextPlayer() const { return m_nextPlayer; }
+
+	void setSuspend(bool a_suspend) { m_suspend = a_suspend; }
+	bool getSuspend() const { return m_suspend; }
+
+
 private:
 
+	int m_turnsPlayed = 0;
+
+	Player* m_curPlayer = nullptr;
+
+	Player* m_nextPlayer = nullptr;
+
+	bool m_suspend = false;
+
+	bool m_resumingGame = false;
+
+	bool m_playAgain = false;
 };

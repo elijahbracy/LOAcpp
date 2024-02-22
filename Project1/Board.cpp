@@ -4,11 +4,6 @@
 
 using namespace std;
 
-Board::Board()
-{
-
-}
-
 bool Board::isWinningMove(string move, char curColor)
 {
 	Board* buffBoard = new Board;
@@ -256,6 +251,28 @@ void Board::copyBoard(char buffBoard[][8])
 		}
 	}
 };
+
+void  Board::resetBoard() 
+{
+	char defaultBoard[8][8] = {
+		{'.', 'B', 'B', 'B', 'B', 'B', 'B', '.'},
+		{'W', '.', '.', '.', '.', '.', '.', 'W'},
+		{'W', '.', '.', '.', '.', '.', '.', 'W'},
+		{'W', '.', '.', '.', '.', '.', '.', 'W'},
+		{'W', '.', '.', '.', '.', '.', '.', 'W'},
+		{'W', '.', '.', '.', '.', '.', '.', 'W'},
+		{'W', '.', '.', '.', '.', '.', '.', 'W'},
+		{'.', 'B', 'B', 'B', 'B', 'B', 'B', '.'}
+	};
+
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			board[i][j] = defaultBoard[i][j];
+		}
+	}
+}
 
 vector<string> Board::getPossibleMoves(char curColor)
 {

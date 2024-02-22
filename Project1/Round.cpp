@@ -6,14 +6,11 @@
 #include <sstream>
 using namespace std;
 
-Round::Round() {};
-
-
 void Round::roundStart(Player* player1, Player* player2) {
 
 	// if players have tie, flip coin, else player with more wins goes first
-	if (player1->roundsWon == player2->roundsWon) {
-		char coinResult = 'h'; //coinFlip();
+	if (player1->getRoundsWon() == player2->getRoundsWon()) {
+		char coinResult = coinFlip();
 
 		char guess;
 
@@ -41,8 +38,8 @@ void Round::roundStart(Player* player1, Player* player2) {
 		if (tolower(guess) == coinResult)
 		{
 			cout << "You won the coin toss. You will play first. Your color: Black" << endl;
-			curPlayer = player1;
-			nextPlayer = player2;
+			setCurPlayer(player1);
+			setNextPlayer(player2);
 			player1->setColor('B');
 			player2->setColor('W');
 
@@ -50,15 +47,15 @@ void Round::roundStart(Player* player1, Player* player2) {
 		else
 		{
 			cout << "You lost the coin toss. Opponent will play first. Your color: White" << endl;
-			curPlayer = player2;
-			nextPlayer = player1;
+			setCurPlayer(player2);
+			setNextPlayer(player1);
 			player1->setColor('W');
 			player2->setColor('B');
 		}
 	}
 	else {
-		curPlayer = (player1->roundsWon > player2->roundsWon) ? player1 : player2; // gpt for ternary operator syntax
-		nextPlayer = (player1->roundsWon < player2->roundsWon) ? player1 : player2;
+		setCurPlayer((player1->getRoundsWon() > player2->getRoundsWon()) ? player1 : player2); // gpt for ternary operator syntax
+		setNextPlayer((player1->getRoundsWon() < player2->getRoundsWon()) ? player1 : player2);
 	}
 };
 
@@ -69,42 +66,30 @@ void Round::announceRoundWin(Player* curPlayer, Player* nextPlayer)
 
 
 	curPlayer->displayName();
-	cout << " scored " << curPlayer->totalPieces - nextPlayer->totalPieces << " points" << endl;
-	cout << "Total tournament score after round:" << curPlayer->tournamentScore << endl;
+	cout << " scored " << curPlayer->getPiecesOnBoard() - nextPlayer->getPiecesOnBoard() << " points" << endl;
+	cout << "Total tournament score after round:" << curPlayer->getTournamentScore() << endl;
 
 
 	nextPlayer->displayName();
 	cout << " scored " << "0 points" << endl;
-	cout << "Total tournament score after round:" << nextPlayer->tournamentScore << endl;
-	curPlayer->score = 0;
+	cout << "Total tournament score after round:" << nextPlayer->getTournamentScore() << endl;
+	curPlayer->setScore(0);
 };
-
-
-Player* Round::GetNextPlayer(vector<Player*>& playerList, Player* curPlayer)
-{
-	Player* buff = this->curPlayer;
-
-	this->curPlayer = this->nextPlayer;
-
-	this->nextPlayer = buff;
-
-	return buff;
-}
 
 void Round::SwitchPlayers()
 {
-	Player* buff = this->curPlayer;
+	Player* buff = getCurPlayer();
 
-	this->curPlayer = this->nextPlayer;
+	setCurPlayer(getNextPlayer());
 
-	this->nextPlayer = buff;
+	setNextPlayer(buff);
 }
 
 void Round::Score(Player* winner, int numOpponentPieces)
 {
-	winner->roundsWon += 1;
-	winner->score += winner->totalPieces - numOpponentPieces;
-	winner->tournamentScore += winner->score;
+	winner->setRoundsWon(winner->getRoundsWon() + 1);
+	winner->setScore(winner->getPiecesOnBoard() - numOpponentPieces);
+	winner->setTournamentScore(winner->getTournamentScore() + winner->getScore());
 };
 
 void Round::PlayAgain()
@@ -125,10 +110,11 @@ void Round::PlayAgain()
 
 	if (response == 'Y')
 	{
-		this->playAgain = true;
+		setResumeGame(false);
+		setPlayAgain(true);
 		return;
 	}
-	this->playAgain = false;
+	setPlayAgain(false);
 
 };
 
@@ -136,7 +122,7 @@ char Round::coinFlip()
 {
 	int headsOrTails;
 	srand(time(NULL));
-	headsOrTails = rand() % 2 + 1; // will return 1 for heads or 2 for tails
+	headsOrTails = rand() % 2 + 1;
 
 	if (headsOrTails == 1)
 	{
@@ -150,7 +136,7 @@ char Round::coinFlip()
 
 };
 
-void Round::suspendGame(Board* board, Player* human, Player* comp)
+void Round::suspendGame()
 {
 	char response;
 	do
@@ -205,7 +191,7 @@ void Round::suspendGame(Board* board, Player* human, Player* comp)
 		}
 
 		// get board
-		const char(*boardPtr)[8] = board->getBoard();
+		const char(*boardPtr)[8] = this.bo->getBoard();
 
 		out << "Board:" << endl;
 		// save board state
@@ -229,14 +215,14 @@ void Round::suspendGame(Board* board, Player* human, Player* comp)
 
 		out << endl;
 		out << "Human:" << endl;
-		out << "Rounds won: " << human->roundsWon << endl;
-		out << "Score: " << human->score << endl;
+		out << "Rounds won: " << human->getRoundsWon() << endl;
+		out << "Score: " << human->getScore() << endl;
 		out << endl;
 		out << "Computer: " << endl;
-		out << "Rounds won: " << comp->roundsWon << endl;
-		out << "Score: " << comp->score << endl;
+		out << "Rounds won: " << comp->getRoundsWon() << endl;
+		out << "Score: " << comp->getScore() << endl;
 		out << endl;
-		if (this->nextPlayer == human)
+		if (getNextPlayer() == human)
 		{
 			out << "Next player: " << "Human" << endl;
 		}
@@ -244,7 +230,7 @@ void Round::suspendGame(Board* board, Player* human, Player* comp)
 		{
 			out << "Next player: " << "Computer" << endl;
 		}
-		if (this->nextPlayer->getColor() == 'B')
+		if (getNextPlayer()->getColor() == 'B')
 		{
 			out << "Color: " << "Black" << endl;
 		}
@@ -256,13 +242,13 @@ void Round::suspendGame(Board* board, Player* human, Player* comp)
 
 		out.close();
 
-		this->suspend = true;
+		setSuspend(true);
 	}
 };
 
 bool Round::resumeGame()
 {
-	cout << "Would you like to resume a game?: ";
+	cout << "Would you like to resume a game? (y/n): ";
 	char response;
 	do
 	{
@@ -345,7 +331,7 @@ void Round::loadGameState(Board* board, Player* human, Player* computer)
 			if (pos != string::npos)
 			{
 				//cout << "human rounds won = " << stoi(line.substr(pos + 12)) << endl;
-				human->roundsWon = stoi(line.substr(pos + 12));
+				human->setRoundsWon(stoi(line.substr(pos + 12)));
 			}
 
 			// get next line for score
@@ -358,7 +344,7 @@ void Round::loadGameState(Board* board, Player* human, Player* computer)
 			if (pos != string::npos)
 			{
 				//cout << "human score = " << stoi(line.substr(pos + 7)) << endl;
-				human->tournamentScore = stoi(line.substr(pos + 7));
+				human->setTournamentScore(stoi(line.substr(pos + 7)));
 			}
 		}
 
@@ -371,11 +357,11 @@ void Round::loadGameState(Board* board, Player* human, Player* computer)
 			// look for Rounds won:
 			size_t pos = line.find("Rounds won:");
 
-			// if found, set human rounds won to number after colon
+			// if found, set computer rounds won to number after colon
 			if (pos != string::npos)
 			{
 				//cout << "comp rounds won = " << stoi(line.substr(pos + 12)) << endl;
-				computer->roundsWon = stoi(line.substr(pos + 12));
+				computer->setRoundsWon(stoi(line.substr(pos + 12)));
 			}
 
 			// get next line for score
@@ -388,7 +374,7 @@ void Round::loadGameState(Board* board, Player* human, Player* computer)
 			if (pos != string::npos)
 			{
 				//cout << "computer score = " << stoi(line.substr(pos + 7)) << endl;
-				computer->tournamentScore = stoi(line.substr(pos + 7));
+				computer->setTournamentScore(stoi(line.substr(pos + 7)));
 			}
 		}
 
@@ -402,14 +388,14 @@ void Round::loadGameState(Board* board, Player* human, Player* computer)
 			if (line.substr(pos + 13) == "Human")
 			{
 				//cout << "current player = human" << endl;
-				this->curPlayer = human;
-				this->nextPlayer = computer;
+				setCurPlayer(human);
+				setNextPlayer(computer);
 			}
 
 			else
 			{
-				this->curPlayer = computer;
-				this->nextPlayer = human;
+				setCurPlayer(computer);
+				setNextPlayer(human);
 			}
 		}
 
@@ -424,19 +410,19 @@ void Round::loadGameState(Board* board, Player* human, Player* computer)
 			if (line.substr(pos + 7) == "Black")
 			{
 				//cout << "current player color = black" << endl;
-				this->curPlayer->setColor('B');
-				this->nextPlayer->setColor('W');
+				getCurPlayer()->setColor('B');
+				getNextPlayer()->setColor('W');
 			}
 
 			else
 			{
-				this->curPlayer->setColor('W');
-				this->nextPlayer->setColor('B');
+				getCurPlayer()->setColor('W');
+				getNextPlayer()->setColor('B');
 			}
 		}
 	}
 	cout << "game state loaded." << endl;
-	this->resumingGame = true;
+	setResumeGame(true);
 }
 
 string Round::getPath()

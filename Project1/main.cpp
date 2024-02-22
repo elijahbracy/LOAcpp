@@ -10,8 +10,6 @@ int main() {
 	Human* p1 = new Human;
 	Player* p2 = new Computer;
 	Tournament tournament;
-
-	// added for further modularity of how many players in a game, just 2 will be used for now
 	vector<Player*> players = { p1, p2 };
 
 	//ask to resume game on startup
@@ -25,13 +23,13 @@ int main() {
 	do {
 
 		//if first turn and not continuing game, initialize board and round
-		if (round.turnsPlayed == 0 && round.resumingGame == false)
+		if (round.getTurnsPlayed() == 0 && round.getResumeGame() == false)
 		{
 			//initialize round
 			round.roundStart(p1, p2);
 
 			// initialize board
-			board->setBoard(board->defaultBoard);
+			board->resetBoard();
 		}
 
 		// print board
@@ -39,11 +37,11 @@ int main() {
 
 		//display current player
 		cout << "Current player: ";
-		round.curPlayer->displayName();
-		cout << " Color: " << round.curPlayer->getColor() << endl;
+		round.getCurPlayer()->displayName();
+		cout << " Color: " << round.getCurPlayer()->getColor() << endl;
 
 		// have player make their turn
-		round.curPlayer->play(board);
+		round.getCurPlayer()->play(board);
 
 		// for each player, update pieces on board
 		for (int i = 0; i < players.size(); i++)
@@ -52,22 +50,22 @@ int main() {
 		}
 
 		// check for win
-		if (board->CountGroups(round.curPlayer->getColor()) == 1)
+		if (board->CountGroups(round.getCurPlayer()->getColor()) == 1)
 		{
 			// score round
-			round.Score(round.curPlayer, round.nextPlayer->totalPieces);
+			round.Score(round.getCurPlayer(), round.getNextPlayer()->getPiecesOnBoard());
 
 			// announce winner
-			round.announceRoundWin(round.curPlayer, round.nextPlayer);
+			round.announceRoundWin(round.getCurPlayer(), round.getNextPlayer());
 
 			// ask to play again
 			round.PlayAgain();
 
 			// set turns played to 0
-			round.turnsPlayed = 0;
+			round.setTurnsPlayed(0);
 
 			// if play again, start gameloop over
-			if (round.playAgain)
+			if (round.getPlayAgain())
 			{
 				continue;
 			}
@@ -77,21 +75,21 @@ int main() {
 		}
 
 		//increment turns played
-		round.turnsPlayed += 1;
+		round.setTurnsPlayed(round.getTurnsPlayed() + 1);
 
 		// ask if they would like to suspend game
 		// parameters unneeccessacry
-		round.suspendGame(board, p1, p2);
+		round.suspendGame();
 
 		// get next player
 		round.SwitchPlayers();
 
-	} while (!round.suspend);
+	} while (!round.getSuspend());
 
 	// announce tournament ending stats, skip if suspending game
-	if (!round.suspend)
+	if (!round.getSuspend())
 	{
-		tournament.announceTournamentResult(round.curPlayer, round.nextPlayer);
+		tournament.announceTournamentResult(round.getCurPlayer(), round.getNextPlayer());
 	}
 
 

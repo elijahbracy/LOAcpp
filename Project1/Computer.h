@@ -4,9 +4,11 @@
 
 class Computer :public Player
 {
-	string name = "Computer";
-	virtual void play(Board* board);
+public:
+	Computer() {};
+	~Computer() override {};
 	void displayName() { cout << name; };
-	//vector<pair<string, int>> gaugeMove(string move, Board board);
-
+private:
+	virtual void play(Board* board);
+	string name = "Computer";
 };
